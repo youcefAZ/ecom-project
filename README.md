@@ -2,7 +2,7 @@
 Projet e-commerce SII  M1 S2 USTHB
 
 Programmed on python 3
-
+***
 ###Reference
 
 Dalila Boughaci, Belaïd Benhamou, Habiba Drias. Une recherche locale stochastique pour le problème
@@ -11,6 +11,7 @@ Francophones de Programmation par Contraintes, LINA - Université de Nantes - Ec
 Nantes, Jun 2008, Nantes, France. pp.59-68. ffinria-00290789f
 
 Source : https://github.com/SamyMe/WinnerDeterminationProblem
+***
+###Usage :
 
-###Usage
 python sls.py benchmarkfile
