@@ -14,4 +14,4 @@ Source : https://github.com/SamyMe/WinnerDeterminationProblem
 ***
 ###Usage :
 
-python sls.py benchmarkfile
+python Source\main.py benchmarks\file.txt
