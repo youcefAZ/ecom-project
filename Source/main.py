@@ -8,6 +8,7 @@ from numpy.core.fromnumeric import size
 import pandas as pd
 import GreyWolf as gw
 
+randomvar=0
 nbB=0
 nbI=0
 bids=[]
@@ -95,8 +96,10 @@ def sls(lock):
 		r = random()
 		if r<wp:
 			selected=sol[0]
+		'''	print("outside boucle, ",selected,"\n")
 			while selected in sol:
 				selected=randint(0,nbB-1)
+			print("finished the stupid shit")'''
 
 		print("verify selected solution in closed\n")
 		if [selected, sol] in closed:
@@ -172,7 +175,7 @@ if __name__ == "__main__":
 				    [nbI,nbB]=map(int,filter(None,line[1].strip('\n').split(" ")))
 			    else:		
 				    aline=line[1].strip('\n').split(" ")
-				    #aline= filter(lambda x: x is not None,aline) # fastest
+				    #aline= filter(None,aline) # fastest
 				    c={}
 				    c["price"]=float(aline[0])
 				    c["items"]=map(int,aline[1:])
@@ -181,6 +184,9 @@ if __name__ == "__main__":
 	
 	conflict=conflictGraph()
 
+	#here onwards is just sls, so if u wanna use greyWolf start from here, 
+	#you will only need conflictGraph 
+	
 	bestResponse=0
 	bestProfit=0
 	n=50
@@ -211,7 +217,8 @@ if __name__ == "__main__":
 
 		print ("Best solution is:")
 		print(bestSol)
-		print (profit(bestSol))
+		print (profit(bestSol)," size sol : ",size(bestSol))
+
 
 		if profit(bestSol)>bestProfit:
 			bestResponse=bestSol
@@ -226,8 +233,8 @@ if __name__ == "__main__":
 	for i in bestSol:
 		for j in bestSol:
 			if j!=i and (j in conflict[i]):
-				#print "ERROR"
+				print ("ERROR")
 				break
-	#print "Solution is fine"
+	print ("Solution is fine")
 
 
