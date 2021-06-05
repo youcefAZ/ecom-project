@@ -7,6 +7,7 @@ import os
 from numpy.core.fromnumeric import size
 import pandas as pd
 import GreyWolf as gw
+import numpy as np
 
 randomvar=0
 nbB=0
@@ -68,13 +69,13 @@ def randomKey():
 def conflictGraph():
 	global bids
 	global nbB
-	print("in conflictGraph\n")
 	conflict={}
 	for i in range(nbB):
 		conflict[i]=[]
 		for j in range(nbB):
-			if (set(bids[i]["items"])-set(bids[j]["items"]) != set(bids[i]["items"])) and (i != j) and not (j in conflict[i]):
+			if  i!=j and set(bids[i]["items"])-set(bids[j]["items"])!=bids[i]["items"] :
 				conflict[i].append(j)
+					
 	return conflict
 
 	
@@ -86,22 +87,18 @@ def sls(lock):
 	global wp
 	global nbB
 	closed=[]
-	print("in SLS")
 	for iteration in range(maxiter):
 		lock.acquire()
 		sol=bestSol[:]
 		lock.release()
 
-
+	
 		r = random()
 		if r<wp:
 			selected=sol[0]
-		'''	print("outside boucle, ",selected,"\n")
 			while selected in sol:
 				selected=randint(0,nbB-1)
-			print("finished the stupid shit")'''
 
-		print("verify selected solution in closed\n")
 		if [selected, sol] in closed:
 			continue
 		else: 
@@ -115,20 +112,17 @@ def sls(lock):
 		key=[1]*nbB
 		key[selected]=0
 
-		print("verifying if bid is in the selected conflict\n")
 		for bid in conflict[selected]:
 			if bid in sol:
 				sol.remove(bid)
 
 		sol.append(selected)
 
-		print("we parcour the line\n")
 		for bid in sol:
 			key[bid]=0
 			for i in conflict[bid]:
 				key[i]=0
 		
-		print("using nbB?\n")
 		for i in range(nbB):
 			if key[i]==1:
 				sol.append(i)
@@ -136,7 +130,7 @@ def sls(lock):
 					key[j]=0
 	
 		lock.acquire()
-		print("verifying the bestprofit compared to this iteration\n")
+
 		if bestProfit<profit(sol):
 			bestSol = sol[:]
 			bestProfit=profit(sol)
@@ -147,28 +141,7 @@ def sls(lock):
 
 #------------------------------- MAIN SLS ---------------------------------
 if __name__ == "__main__":
-	'''
-	try:
-		print(os.listdir("benchmarks"))
-		nbB, nbI, conflict,bids = pickle.load(open(sys.argv[1]+".pkl","r"))
-	except Exception:
-		with open(sys.argv[1]) as f:
-	 		for line in enumerate(f):
-			    if line[0]==0:
-				    [nbI,nbB]=map(int,filter(None,line[1].strip('\n').split(" ")))
-			    else:		
-				    aline=line[1].strip('\n').split(" ")
-				    aline= filter(None,aline) # fastest
-				    c={}
-				    c["price"]=float(aline[0])
-				    c["items"]=map(int,aline[1:])
-				    bids.append(c)
-	
-		conflict=conflictGraph()
 
-		pickle.dump((nbB,nbI,conflict,bids),open(sys.argv[1]+".pkl","w+"))
-    '''
-	
 	with open(sys.argv[1]) as f:
 	 		for line in enumerate(f):
 			    if line[0]==0:
@@ -178,11 +151,14 @@ if __name__ == "__main__":
 				    #aline= filter(None,aline) # fastest
 				    c={}
 				    c["price"]=float(aline[0])
-				    c["items"]=map(int,aline[1:])
+				    c["items"]=list(aline[1:])
 				    bids.append(c)
 	
 	
 	conflict=conflictGraph()
+	
+	#print(type(bids),"bids\n",bids)
+	#print(type(conflict),"cnf\n",conflict)
 
 	#here onwards is just sls, so if u wanna use greyWolf start from here, 
 	#you will only need conflictGraph 
@@ -201,15 +177,12 @@ if __name__ == "__main__":
 
 
 		agent=[0]*n
-		print("begining the threading\n")
 		for t in range(n):
 			agent[t] = threading.Thread(target=sls, args=(lock,))
 
-		print("starting the agents\n")
 		for t in range(n):	
 			agent[t].start()
 
-		print("joining? the agents\n")
 		for t in range(n):	
 			agent[t].join()
 
@@ -236,5 +209,3 @@ if __name__ == "__main__":
 				print ("ERROR")
 				break
 	print ("Solution is fine")
-
-
